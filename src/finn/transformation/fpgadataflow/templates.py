@@ -135,6 +135,10 @@ if {$BOARD == "ZCU104"} {
 } elseif {$BOARD == "KV260_SOM"} {
     set ZYNQ_TYPE "zynq_us+"
     set_property board_part xilinx.com:kv260_som:part0:1.3 [current_project]
+} elseif {$BOARD == "Zynq-7015"} {
+    set ZYNQ_TYPE "zynq_7000"
+    # xc7z015clg485-2 has no official board part, use generic Zynq-7000
+    puts "Using Zynq-7015 (xc7z015clg485-2) without board part"
 } else {
     puts "Unrecognized board"
 }
