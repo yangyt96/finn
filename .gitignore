@@ -28,13 +28,14 @@
 
 # Temporary and binary files
 *~
+*.jou
+*.log
 *.py[cod]
 *.so
 *.cfg
 !.isort.cfg
 !setup.cfg
 *.orig
-*.log
 *.pot
 __pycache__/*
 .cache/*
@@ -96,3 +97,9 @@ MANIFEST
 
 # downloaded dep repos
 /deps/
+
+# FINN build outputs (tutorials)
+tutorials/fpga_flow/output_*/
+
+# FINN workspace (generated during build)
+/workspace/finn_dev_*/

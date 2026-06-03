@@ -1,0 +1,3 @@
+[submodule "deps/dataset_loading"]
+	path = deps/dataset_loading
+	url = https://github.com/fbcotter/dataset_loading.git
