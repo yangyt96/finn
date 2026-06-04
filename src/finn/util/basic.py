@@ -29,7 +29,7 @@
 import os
 import subprocess
 import sys
-import tempfile
+from datetime import datetime
 from qonnx.util.basic import roundup_to_integer_multiple
 
 # test boards
@@ -122,11 +122,9 @@ def get_finn_root():
     try:
         return os.environ["FINN_ROOT"]
     except KeyError:
-        raise Exception(
-            """Environment variable FINN_ROOT must be set
+        raise Exception("""Environment variable FINN_ROOT must be set
         correctly. Please ensure you have launched the Docker contaier correctly.
-        """
-        )
+        """)
 
 
 def pyverilate_get_liveness_threshold_cycles():
@@ -138,19 +136,22 @@ def pyverilate_get_liveness_threshold_cycles():
 
 def make_build_dir(prefix=""):
     """Creates a folder with given prefix to be used as a build dir.
-    Use this function instead of tempfile.mkdtemp to ensure any generated files
-    will survive on the host after the FINN Docker container exits."""
+    Uses timestamp instead of random suffix for readable directory names."""
     try:
-        tmpdir = tempfile.mkdtemp(prefix=prefix)
-        newdir = tmpdir.replace("/tmp", os.environ["FINN_BUILD_DIR"])
-        os.makedirs(newdir)
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        # Strip trailing underscore from prefix, append timestamp
+        clean_prefix = prefix.rstrip("_")
+        if clean_prefix:
+            dirname = f"{clean_prefix}_{timestamp}"
+        else:
+            dirname = f"build_{timestamp}"
+        newdir = os.path.join(os.environ["FINN_BUILD_DIR"], dirname)
+        os.makedirs(newdir, exist_ok=True)
         return newdir
     except KeyError:
-        raise Exception(
-            """Environment variable FINN_BUILD_DIR must be set
+        raise Exception("""Environment variable FINN_BUILD_DIR must be set
         correctly. Please ensure you have launched the Docker contaier correctly.
-        """
-        )
+        """)
 
 
 class CppBuilder:
@@ -209,7 +210,7 @@ def launch_process_helper(args, proc_env=None, cwd=None):
     with subprocess.Popen(
         args, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=proc_env, cwd=cwd
     ) as proc:
-        (cmd_out, cmd_err) = proc.communicate()
+        cmd_out, cmd_err = proc.communicate()
     if cmd_out is not None:
         cmd_out = cmd_out.decode("utf-8")
         sys.stdout.write(cmd_out)
